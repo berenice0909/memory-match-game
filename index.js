@@ -245,9 +245,48 @@ function resetUIAfterGameEnd() {
   console.log("Game reset: UI and grid cleared.");
 }
 
+function applyTheme(theme) {
+  console.log(`[Theme] Requested theme: ${theme}`);
+
+  if (!theme || (theme !== "light" && theme !== "dark")) {
+    console.log("[Theme] Invalid theme provided:", theme);
+    return;
+  }
+
+  const body = document.body;
+  console.log("[Theme] Current body classes:", body.className);
+
+  // Remove previous theme classes
+  body.classList.remove("theme-light", "theme-dark");
+  console.log("[Theme] Removed previous theme classes.");
+
+  // Add new theme class
+  body.classList.add(`theme-${theme}`);
+  console.log(`[Theme] Applied class theme-${theme}`);
+
+  // Update visual state in dropdown
+  $("#lightThemeBtn, #darkThemeBtn").removeClass("active");
+  $(`#${theme}ThemeBtn`).addClass("active");
+  console.log(`[Theme] Activated dropdown item: ${theme}ThemeBtn`);
+}
+
 $(document).ready(function () {
+  console.log("[Init] Applying default theme (light)");
+  applyTheme("light");
+
   $("#start_btn").on("click", startGame);
   $("#restart_btn").on("click", restartGame);
+  
+  $("#lightThemeBtn").on("click", function () {
+  console.log("[Theme] Light theme button clicked.");
+  applyTheme("light");
+});
+
+$("#darkThemeBtn").on("click", function () {
+  console.log("[Theme] Dark theme button clicked.");
+  applyTheme("dark");
+});
+
 });
 
 

@@ -47,3 +47,29 @@ body {
 .front_face {
   transform: rotateY(180deg);
 }
+
+/* Dark Theme (default) */
+body.theme-dark {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+body.theme-dark .nav-link {
+  color: #66b2ff;
+}
+
+/* Light Theme */
+body.theme-light {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.theme-light .nav-link {
+  color: #0056b3;
+}
+
+.dropdown-item.active {
+  background-color: #0d6efd; /* Bootstrap primary */
+  color: white;
+}
+
