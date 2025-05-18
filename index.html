@@ -16,109 +16,121 @@
 
 <body>
 
+  <main>
 
-  <!-- Floating Theme Toggle -->
-<div id="theme-toggle-container" class="position-fixed bottom-0 end-0 m-3">
-  <div class="dropdown">
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="themeToggleBtn" data-bs-toggle="dropdown" aria-expanded="false">
-      Theme
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeToggleBtn">
-      <li><button class="dropdown-item" id="lightThemeBtn">Light</button></li>
-      <li><button class="dropdown-item" id="darkThemeBtn">Dark</button></li>
-    </ul>
-  </div>
-</div>
-
-  <!--Hero Banner-->
-
-  <section class="text-center bg-dark text-white py-5">
-    <div class="container">
-      <h1 class="display-4 fw-bold">Pokémon Memory Match</h1>
-      <p class="lead mb-4">
-        Flip cards to find matching Pokémon. Match them all before time runs out!
-      </p>
-    </div>
-  </section>
-
-  <!--Control Panel-->
-
-  <div class="container my-4">
-    <div class="row justify-content-center align-items-center g-2">
-      <div class="col-auto">
-        <button id="start_btn" class="btn btn-primary">Start Game</button>
+    <!--Hero Banner-->
+    <section class="text-center bg-dark text-white py-5">
+      <div class="container">
+        <h1 class="display-4 fw-bold">Pokémon Memory Match</h1>
+        <p class="lead mb-4">
+          Flip cards to find matching Pokémon. Match them all before time runs out!
+        </p>
       </div>
-      <div class="col-auto">
-        <button id="restart_btn" class="btn btn-secondary" disabled>Restart</button>
-      </div>
-      <div class="col-auto">
-        <select id="difficulty_select" class="form-select" style="min-width: 150px;">
-          <option value="easy">Easy</option>
-          <option value="medium" selected>Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+    </section>
+
+    <!--Control Panel-->
+    <div class="container my-4">
+      <div class="row justify-content-center align-items-center g-2">
+        <div class="col-auto">
+          <button id="start_btn" class="btn btn-primary">Start Game</button>
+        </div>
+        <div class="col-auto">
+          <button id="restart_btn" class="btn btn-secondary" disabled>Restart</button>
+        </div>
+        <div class="col-auto">
+          <select id="difficulty_select" class="form-select" style="min-width: 150px;">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button id="powerup_btn" class="btn btn-warning" style="display: none;">Power-Up</button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!--Stats Bar-->
-
-  <div class="container mb-4">
-    <ul class="nav nav-pills justify-content-center">
-      <li class="nav-item">
-        <span id="click_count" class="nav-link">Clicks: 0</span>
-      </li>
-      <li class="nav-item">
-        <span id="pairs_matched" class="nav-link">Matched: 0</span>
-      </li>
-      <li class="nav-item">
-        <span id="pairs_remaining" class="nav-link">Remaining: 0</span>
-      </li>
-      <li class="nav-item">
-        <span id="timer" class="nav-link">Time: 60s</span>
-      </li>
-
-    </ul>
-  </div>
 
 
-  <div id="game_grid"></div>
+    <!--Stats Bar-->
+    <div class="container mb-4">
+      <ul class="nav nav-pills justify-content-center">
+        <li class="nav-item">
+          <span id="click_count" class="nav-link">Clicks: 0</span>
+        </li>
+        <li class="nav-item">
+          <span id="pairs_matched" class="nav-link">Matched: 0</span>
+        </li>
+        <li class="nav-item">
+          <span id="pairs_remaining" class="nav-link">Remaining: 0</span>
+        </li>
+        <li class="nav-item">
+          <span id="timer" class="nav-link">Time: 60s</span>
+        </li>
 
-  <!-- Win Modal -->
-<div class="modal fade" id="winModal" tabindex="-1" aria-labelledby="winModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-success text-white">
-      <div class="modal-header border-0">
-        <h5 class="modal-title" id="winModalLabel">Congratulations!</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        You matched all Pokémon pairs!
-      </div>
-      <div class="modal-footer border-0">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+      </ul>
+    </div>
+
+    <!--Loading Message-->
+    <div id="loading_alert" class="alert alert-info text-center mx-auto" style="max-width: 400px; display: none;">
+      Retrieving Pokémon cards...
+    </div>
+
+    <!--Card Grid-->
+    <div id="game_grid"></div>
+
+    <!-- Win Modal -->
+    <div class="modal fade" id="winModal" tabindex="-1" aria-labelledby="winModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-success text-white">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="winModalLabel">Congratulations!</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            You matched all Pokémon pairs!
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Loss Modal -->
-<div class="modal fade" id="loseModal" tabindex="-1" aria-labelledby="loseModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-danger text-white">
-      <div class="modal-header border-0">
-        <h5 class="modal-title" id="loseModalLabel">Time’s Up!</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        You ran out of time before matching all Pokémon.
-      </div>
-      <div class="modal-footer border-0">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+    <!-- Loss Modal -->
+    <div class="modal fade" id="loseModal" tabindex="-1" aria-labelledby="loseModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-danger text-white">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="loseModalLabel">Time’s Up!</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            You ran out of time before matching all Pokémon.
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+
+  </main>
+
+  <footer class="bg-dark text-white mt-5 border-top">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+      <span>&copy; 2025 Pokémon Memory Match</span>
+      <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" id="themeToggleBtn"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          Theme
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeToggleBtn">
+          <li><button class="dropdown-item" id="lightThemeBtn">Light</button></li>
+          <li><button class="dropdown-item" id="darkThemeBtn">Dark</button></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
 
 
 </body>

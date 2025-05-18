@@ -46,25 +46,56 @@ function startTimer() {
 
 
 async function fetchRandomPokemon(limit = 3) {
-  const maxId = 1025; // safest range to avoid gaps
-  const ids = new Set();
+  const maxId = 1025;
+  const selectedPokemon = [];
+  const usedIds = new Set();
 
-  while (ids.size < limit) {
-    ids.add(Math.floor(Math.random() * maxId) + 1);
+  while (selectedPokemon.length < limit) {
+    const id = Math.floor(Math.random() * maxId) + 1;
+    if (usedIds.has(id)) continue;
+
+    try {
+      const res = await fetch(`${POKE_API_BASE}/${id}`);
+      const data = await res.json();
+      const image = data.sprites.other["official-artwork"].front_default;
+
+      if (image) {
+        // Preload image
+        const img = new Image();
+        img.src = image;
+
+        // Wait for it to load
+        await new Promise(resolve => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve(); // proceed even if image fails
+        });
+
+        selectedPokemon.push({
+          name: data.name,
+          id: data.id,
+          image: image
+        });
+
+        console.log(`[Fetch] Accepted Pokémon: ${data.name} (ID ${id})`);
+
+        console.log(`[Fetch] Accepted Pokémon: ${data.name} (ID ${id})`);
+      } else {
+        console.log(`[Fetch] Skipped Pokémon (no image): ID ${id}`);
+      }
+
+      usedIds.add(id);
+
+      // Add delay before next request (500ms)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+    } catch (error) {
+      console.log(`[Fetch] Error fetching Pokémon ID ${id}:`, error);
+    }
   }
 
-  const promises = [...ids].map(id =>
-    fetch(`${POKE_API_BASE}/${id}`)
-      .then(res => res.json())
-      .then(data => ({
-        name: data.name,
-        id: data.id,
-        image: data.sprites.other["official-artwork"].front_default
-      }))
-  );
-
-  return Promise.all(promises);
+  return selectedPokemon;
 }
+
 
 
 function setup() {
@@ -156,6 +187,7 @@ function renderCards(pokemonList) {
 
 async function startGame() {
   console.log("Game started.");
+$("#loading_alert").show();
 
   // Difficulty-based logic
   const difficulty = $("#difficulty_select").val();
@@ -172,6 +204,8 @@ async function startGame() {
 
   const pokemonList = await fetchRandomPokemon(pairCount);
   renderCards(pokemonList);
+  $("#loading_alert").hide();
+
   setup(); // enables flip/click logic
   resetStats();
   startTimer();
@@ -180,10 +214,14 @@ async function startGame() {
   $("#start_btn").hide();
   $("#restart_btn").prop("disabled", false);
   $("#difficulty_select").prop("disabled", true);
+  $("#powerup_btn").show().prop("disabled", false);
+  console.log("[Power-Up] Button shown and enabled on game start.");
+
 }
 
 async function restartGame() {
   console.log("Game restarted by user.");
+$("#loading_alert").show();
 
   const difficulty = $("#difficulty_select").val();
   let pairCount = 6;
@@ -199,6 +237,8 @@ async function restartGame() {
 
   const pokemonList = await fetchRandomPokemon(pairCount);
   renderCards(pokemonList);
+  $("#loading_alert").hide();
+
   setup();
   resetStats();
   startTimer();
@@ -207,6 +247,9 @@ async function restartGame() {
   $("#start_btn").hide();
   $("#restart_btn").prop("disabled", false);
   $("#difficulty_select").prop("disabled", true);
+  $("#powerup_btn").show().prop("disabled", false);
+  console.log("[Power-Up] Button shown and reset on restart.");
+
 }
 
 
@@ -241,6 +284,8 @@ function resetUIAfterGameEnd() {
   $("#click_count").text("Clicks: 0");
   $("#pairs_matched").text("Matched: 0");
   $("#pairs_remaining").text("Remaining: 0");
+  $("#powerup_btn").hide().prop("disabled", true);
+  console.log("[Power-Up] Button hidden and disabled after game end.");
 
   console.log("Game reset: UI and grid cleared.");
 }
@@ -276,16 +321,42 @@ $(document).ready(function () {
 
   $("#start_btn").on("click", startGame);
   $("#restart_btn").on("click", restartGame);
-  
-  $("#lightThemeBtn").on("click", function () {
-  console.log("[Theme] Light theme button clicked.");
-  applyTheme("light");
-});
 
-$("#darkThemeBtn").on("click", function () {
-  console.log("[Theme] Dark theme button clicked.");
-  applyTheme("dark");
-});
+  $("#lightThemeBtn").on("click", function () {
+    console.log("[Theme] Light theme button clicked.");
+    applyTheme("light");
+  });
+
+  $("#darkThemeBtn").on("click", function () {
+    console.log("[Theme] Dark theme button clicked.");
+    applyTheme("dark");
+  });
+
+  $("#powerup_btn").on("click", function () {
+    console.log("[Power-Up] Button clicked.");
+
+    // Disable button immediately
+    $(this).prop("disabled", true);
+    console.log("[Power-Up] Button disabled after use.");
+
+    // Flip all cards
+    $(".card").addClass("flip");
+    console.log("[Power-Up] All cards flipped face-up.");
+
+    // After 3 seconds, flip back only unmatched cards
+    setTimeout(() => {
+      $(".card").each(function () {
+        const front = $(this).find(".front_face")[0];
+        if (front && $(`#${front.id}`).length) {
+          // Check if the card is still clickable (not matched)
+          if ($(this).data("matched") !== true) {
+            $(this).removeClass("flip");
+          }
+        }
+      });
+      console.log("[Power-Up] Unmatched cards flipped back down.");
+    }, 3000);
+  });
 
 });
 
